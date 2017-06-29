@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM cogniteev/oracle-java:java8
 
 # Configuration variables.
 ENV JIRA_HOME     /var/atlassian/jira
@@ -9,8 +9,10 @@ ENV JIRA_VERSION  7.3.8
 # directory structure.
 RUN set -x \
     && apt-get update --quiet \
-    && apt-get install --quiet --yes --no-install-recommends xmlstarlet \
-    && apt-get install --quiet --yes --no-install-recommends -t jessie-backports libtcnative-1 \
+    && apt-get install --quiet --yes --no-install-recommends \
+           xmlstarlet \
+           libtcnative-1 \
+           curl \
     && apt-get clean \
     && mkdir -p                "${JIRA_HOME}" \
     && mkdir -p                "${JIRA_HOME}/caches/indexes" \
@@ -29,7 +31,6 @@ RUN set -x \
     && chown -R daemon:daemon  "${JIRA_INSTALL}/logs" \
     && chown -R daemon:daemon  "${JIRA_INSTALL}/temp" \
     && chown -R daemon:daemon  "${JIRA_INSTALL}/work" \
-    && sed --in-place          "s/java version/openjdk version/g" "${JIRA_INSTALL}/bin/check-java.sh" \
     && echo -e                 "\njira.home=$JIRA_HOME" >> "${JIRA_INSTALL}/atlassian-jira/WEB-INF/classes/jira-application.properties" \
     && touch -d "@0"           "${JIRA_INSTALL}/conf/server.xml"
 
@@ -40,6 +41,8 @@ USER daemon:daemon
 
 # Expose default HTTP connector port.
 EXPOSE 8080
+# Reserve for HTTPS
+EXPOSE 8083
 
 # Set volume mount points for installation and home directory. Changes to the
 # home directory needs to be persisted as well as parts of the installation
