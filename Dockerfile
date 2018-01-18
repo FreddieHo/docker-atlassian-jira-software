@@ -31,6 +31,8 @@ RUN set -x \
     && chown -R daemon:daemon  "${JIRA_INSTALL}/logs" \
     && chown -R daemon:daemon  "${JIRA_INSTALL}/temp" \
     && chown -R daemon:daemon  "${JIRA_INSTALL}/work" \
+    && mv "${JIRA_INSTALL}/bin/setenv.sh" "${JIRA_INSTALL}/bin/setenv.sh.orig" \
+    && sed -e 's/JVM_SUPPORT_RECOMMENDED_ARGS=""/JVM_SUPPORT_RECOMMENDED_ARGS="-Datlassian.plugins.enable.wait=300"/' "${JIRA_INSTALL}/bin/setenv.sh.orig" > "${JIRA_INSTALL}/bin/setenv.sh" \
     && echo -e                 "\njira.home=$JIRA_HOME" >> "${JIRA_INSTALL}/atlassian-jira/WEB-INF/classes/jira-application.properties" \
     && touch -d "@0"           "${JIRA_INSTALL}/conf/server.xml"
 
